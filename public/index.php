@@ -29,7 +29,6 @@ try {
     include ROOT_PATH . '/config/loader.php';
 
 
-
     /**
      * 引入services.php
      */
@@ -51,22 +50,20 @@ try {
 
     $response->send();
 
-//    echo $application->handle()->getContent();
-
 } catch (\Exception $e) {
-//    $log = [
-//        'file'  => $e -> getFile(),
-//        'line'  => $e -> getLine(),
-//        'code'  => $e -> getCode(),
-//        'msg'   => $e -> getMessage(),
-//        'trace' => $e -> getTraceAsString(),
-//    ];
-//
-//    $date = date('Ymd');
-//    $logger = new \Phalcon\Logger\Adapter\File(ROOT_PATH."/cache/logs/{$date}.log");
-//    $logger->error(json_encode($log));
-    echo $e->getMessage() . '<br>';
-    echo '<pre>' . $e -> getFile() . '</pre>';
-    echo '<pre>' . $e -> getMessage() . '</pre>';
-    echo '<pre>' . $e->getTraceAsString() . '</pre>';
+    if (APP_DEBUG == true) {
+        echo $e->getMessage() . '<br>';
+        echo '<pre>' . $e -> getFile() . '</pre>';
+        echo '<pre>' . $e -> getMessage() . '</pre>';
+        echo '<pre>' . $e->getTraceAsString() . '</pre>';
+    } else {
+        $log = [
+            'file'  => $e -> getFile(),
+            'line'  => $e -> getLine(),
+            'code'  => $e -> getCode(),
+            'msg'   => $e -> getMessage(),
+            'trace' => $e -> getTraceAsString(),
+        ];
+        debug($log, 'debug');
+    }
 }

@@ -45,7 +45,17 @@ class Msg
     }
 
 
-    public function return($errorCode, $errorMsg = null, array $data = null, $status = 200)
+    /**
+     * @notes: json返回数据格式
+     * @author: NedRen<ned@pproject.co>
+     * @date: 2018/8/22
+     * @param int $errorCode
+     * @param string $errorMsg
+     * @param array $data
+     * @param int $status
+     * @return mixed
+     */
+    public function return(int $errorCode, string $errorMsg = '', array $data = [], int $status = 200)
     {
         $extraData = [
             'status' => $errorCode,

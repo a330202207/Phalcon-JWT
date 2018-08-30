@@ -21,6 +21,7 @@ return [
         'dbMaster' => [
             'adapter'     => 'mysql',
             'host'        => '127.0.0.1',
+            'port'        => '3306',
             'username'    => 'root',
             'password'    => 'root',
             'dbname'      => 'platform_test',
@@ -29,6 +30,7 @@ return [
         'dbSlave' => [
             'adapter'     => 'mysql',
             'host'        => '192.168.1.28',
+            'port'        => '3306',
             'username'    => 'root',
             'password'    => '123Qwe_^slash',
             'dbname'      => 'platform',
@@ -37,13 +39,33 @@ return [
         //表前缀
         'prefix' => 'pg',
 
-        'dbPlatform' => [
+    ],
+
+    'dbPlatform' => [
+        'dbMaster' => [
             'adapter'     => 'mysql',
-            'host'        => '192.168.1.28',
+            'host'        => '10.1.111.68',
+            'port'        => '3306',
             'username'    => 'root',
-            'password'    => '123Qwe_^slash',
+            'password'    => '123Qwe_^slash^',
             'dbname'      => 'platform',
             'charset'     => 'utf8',
         ],
-    ]
+        'dbSlave' => [
+            'adapter'     => 'mysql',
+            'host'        => '10.1.111.68',
+            'port'        => '3306',
+            'username'    => 'root',
+            'password'    => '123Qwe_^slash^',
+            'dbname'      => 'platform',
+            'charset'     => 'utf8',
+        ]
+    ],
+    // redis配置
+    'redis' => [
+        'servers' => [
+            '127.0.0.1:6379',
+        ],
+        'auth' => '1354243', //目前只有启动单点才有效
+    ],
 ];

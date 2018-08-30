@@ -11,6 +11,7 @@ use Phalcon\Mvc\View;
 use Phalcon\Loader;
 use Phalcon\Mvc\Router;
 use Phalcon\Config\Adapter\Php;
+use Phalcon\Mvc\View\Engine\Volt as VoltEngine;
 
 
 class Module implements ModuleDefinitionInterface
@@ -25,6 +26,7 @@ class Module implements ModuleDefinitionInterface
                 "Apps\\Api\\Controllers" => ROOT_PATH . "/apps/api/controllers/",
                 "Apps\\Api\\Models"      => ROOT_PATH . "/apps/api/models/",
                 "Apps\\Api\\Services"    => ROOT_PATH . "/apps/api/services/",
+                "Apps\\Api\\Views"    => ROOT_PATH . "/apps/api/views/",
             ]
         );
         $loader->register();
@@ -48,7 +50,7 @@ class Module implements ModuleDefinitionInterface
         }
 
         /** DI注册模块路由服务 */
-//        $this->registerRoutersService($di);
+        $this->registerRoutersService($di);
 
         /** DI注册dispatcher服务 */
         $this->registerDispatcherService($di);
@@ -131,6 +133,27 @@ class Module implements ModuleDefinitionInterface
         $di->setShared('view', function () use ($config) {
             $view = new View();
             $view->setViewsDir($config->views);
+            $view->setDI($this);
+            //$view->setPartialsDir($config->views);
+            $view->registerEngines([
+                '.volt' => function ($view) {
+                    $config = $this->get('ModuleConfig');
+                    $volt = new VoltEngine($view, $this);
+                    $volt->setOptions([
+                        'compiledPath' => $config->compiled_path,
+                        'compiledExtension' => '.compiled',
+                        'compiledSeparator' => '_',
+                        'compileAlways' => TRUE
+                    ]);
+                    
+                    //$compiler = $volt->getCompiler();
+
+                    return $volt;
+                },
+                //'.phtml' => PhpEngine::class
+
+            ]);
+
             return $view;
         });
     }

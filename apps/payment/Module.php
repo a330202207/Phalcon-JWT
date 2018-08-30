@@ -40,7 +40,7 @@ class Module implements ModuleDefinitionInterface
          * 注意：该方式与系统本身配置获取方式不同，如需使用系统核心配置请使用Config::get()方式
          */
         if (file_exists(__DIR__ . '/config/config.php')) {
-            $di->set('ModuleConfig', function () use ($di) {
+            $di->set('moduleConfig', function () use ($di) {
                 return new Config(include __DIR__ . '/config/config.php');
             });
         }
@@ -108,7 +108,7 @@ class Module implements ModuleDefinitionInterface
      */
     protected function registerUrlService(DiInterface $di)
     {
-        $config = $di->get('ModuleConfig');
+        $config = $di->get('moduleConfig');
 
         $di->set('url', function () use ($config) {
             $url = new \Phalcon\Mvc\Url();
@@ -124,7 +124,7 @@ class Module implements ModuleDefinitionInterface
      */
     protected function registerViewService(DiInterface $di)
     {
-        $config = $di->get('ModuleConfig');
+        $config = $di->get('moduleConfig');
 
         $di->setShared('view', function () use ($config) {
             $view = new View();

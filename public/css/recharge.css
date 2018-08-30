@@ -1,0 +1,248 @@
+.popup-content-right {
+  overflow: hidden;
+}
+
+.popup-content-list {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+
+.logo_pay_bg1 {
+  padding: 0.3rem 0 0.3rem 0.3rem;
+  height: 100%;
+  overflow: hidden;
+  background: url(../img/logo_pay_bg.png) left top no-repeat;
+}
+
+.recharge-logo {
+  transform: scale(0.7);
+}
+
+.recharge-role {
+  position: fixed;
+  top: -1.4rem;
+  right: -1rem;
+  transform: scale(0.7);
+}
+
+.opration-area {
+  position: relative;
+  top: -0.7rem;
+  padding: 0.1rem;
+  width: 100%;
+  background-color: #1E1E3C;
+}
+
+.opration-area-empty {
+  min-height: 4.75rem;
+}
+
+.opration-area .no-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max-content;
+  transform: translate3d(-50%, -50%, 0);
+  color: #fff;
+}
+
+.show-info {
+  display: flex;
+  align-items: center;
+  color: #fff;
+}
+
+.show-info div {
+  flex: 1;
+}
+
+.show-info .count {
+  color: yellow;
+}
+
+.show-info .proportion {
+  color: #867DBC;
+}
+
+.show-btn {
+  line-height: 0.5rem;
+  margin: 0.05rem 0 0.1rem;
+  /*transform: scale(1.2);*/
+  text-align: center;
+  font-size: 0.16rem;
+  color: #fff;
+}
+
+.recharge-count {
+  display: flex;
+  align-items: center;
+}
+
+.recharge-count .input-count {
+  position: relative;
+  width: max-content;
+}
+
+.recharge-count .count-input, 
+.agent-info .user-id {
+  background: transparent;
+  width: 5rem;
+  height: 0.75rem;
+  padding-left: 0.1rem;
+  position: relative;
+  outline: none;
+  color: #fff;
+}
+
+.clear-count {
+  display: inline-block;
+  position: absolute;
+  top: 0.1rem;
+  right: -0.4rem;
+  transform: scale(0.5);
+}
+
+.agent-info {
+  padding: 0.5rem;
+}
+
+.agent-info .user-id {
+  height: 1rem;
+}
+
+.agent-info .copy-btn {
+  margin-left: 0.5rem;
+  font-size: 0.4rem;
+  color: #fff;
+  text-decoration: underline;
+}
+
+.agent-info .warn-text {
+  flex: 1;
+  margin-right: 10px;
+  text-align: justify;
+  color: #867DBC;
+}
+
+.agent-info .refresh-btn {
+  flex: 0 0 33%;
+}
+
+.agent-info .warn-area {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  bottom: 0.3rem;
+  left: 0.5rem;
+  right: 0;
+}
+
+.recharge-count .recharge-range,
+.recharge-prompt {
+  text-align: center;
+  color: #867DBC;
+}
+
+.recharge-count .recharge-range {
+  flex: 1;
+}
+
+.recharge-prompt {
+  margin: 0.1rem;
+}
+
+.count-list {
+  display: flex;
+  align-items: center;
+}
+
+.count-item {
+  position: relative;
+  flex: 1;
+  margin-right: 5px;
+}
+
+.count-item img {
+  width: 100%;
+}
+
+.count-item .number {
+  position: absolute;
+  display: inline-block;
+  left: 0;
+  right: 0;
+  bottom: 0.15rem;
+  text-align: center;
+  color: yellow;
+}
+
+.has-content {
+  position: relative;
+}
+
+.has-content .custom-select {
+  position: absolute;
+  left: 5.3rem;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: yellow;
+}
+
+.custom-range {
+  transform: scale(0.55);
+}
+
+.keyboard {
+  clear: both;
+  overflow: hidden;
+}
+
+.keyboard .num-item {
+  float: left;
+  width: 33.3%;
+  text-align: center;
+  background: url(../img/ui_lobby_pay_btn_inputbtn1.png) left top no-repeat;
+  background-size: cover;
+}
+
+.submit-area {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  left: 0.3rem;
+  right: 0;
+  bottom: 0;
+  padding: 0.1rem;
+  font-size: 0.1rem;
+}
+
+.submit-area .tip {
+  color: #867DBC;
+}
+
+.fact-name {
+  position: relative;
+}
+
+.fact-name input{
+  background: transparent;
+  height: 0.75rem;
+  padding-left: 0.1rem;
+  position: relative;
+  outline: none;
+  color: #fff;
+}
+
+.pay-btn {
+  width: 2.5rem;
+  height: 0.7rem;
+  float: right;
+}
+
+.pay-btn span {
+  display: inline-block;
+  position: relative;
+  color: #fff;
+}

@@ -1,10 +1,10 @@
 <?php
 
 /**
- * 获取DI
- * @return mixed|\Phalcon\DiInterface
- * @author wangyu <wangyu@ledouya.com>
- * @createTime 2018/5/11 18:54
+ * @notes: 获取DI
+ * @author: NedRen<ned@pproject.co>
+ * @date: 2018/8/30
+ * @return \Phalcon\DiInterface
  */
 function getDI()
 {
@@ -12,10 +12,10 @@ function getDI()
 }
 
 /**
- * 获取数据库实例
- * @return mixed|\Phalcon\Db\AdapterInterface
- * @author wangyu <wangyu@ledouya.com>
- * @createTime 2018/5/11 18:54
+ * @notes: 获取数据库实例
+ * @author: NedRen<ned@pproject.co>
+ * @date: 2018/8/30
+ * @return mixed
  */
 function getDbConnection()
 {
@@ -23,77 +23,14 @@ function getDbConnection()
 }
 
 /**
- * 加载器
- * @return \core\common\Loader
- * @author wangyu <wangyu@ledouya.com>
- * @createTime 2018/5/12 9:08
- */
-function load()
-{
-    static $loader;
-    if (empty($loader)) {
-        $loader = new \core\common\Loader();
-    }
-    return $loader;
-}
-
-/**
- * 异步日志
- * @param string $message 信息
- * @param string $type 类型（debug、error、info、notice、warning、alert、log）
- * @author wangyu <wangyu@ledouya.com>
- * @createTime 2018/3/16 10:52
- * @version 1.2.0
- */
-function asyncLog($message, $type = 'DEBUG')
-{
-    $type = strtolower($type);
-    $typeList = ['DEBUG', 'INFO', 'NOTICE', 'WARNING', 'ERROR', 'CRITICAL', 'ALERT', 'EMERGENCY'];
-    if (!in_array($type, $typeList)) {
-        $type = 'DEBUG';
-    }
-    if (is_array($message)) {
-        $message = json_encode($message, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-    } elseif (is_object($message)) {
-        $message = json_encode($message, JSON_FORCE_OBJECT);
-    }
-    $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-    if ($trace) {
-        $file = $trace[0]['file'];
-        $line = $trace[0]['line']; # 在那一行调用了debug方法
-        $fun = '';
-        $class = '';
-        if (isset($trace[1])) {
-            $fun = $trace[1]['function'];
-            if (isset($trace[1]['class'])) {
-                $class = $trace[1]['class'];
-            }
-        }
-        $ex = explode(ROOT_PATH, $file);
-        $file = $ex[1];
-        if (!$class || !$fun) {
-            $message = "[{$file}:{$line}] " . $message;
-        } else {
-            $message = "[{$file}:{$line}][{$class}:{$fun}] " . $message;
-        }
-    }
-    if (!IS_WIN) {
-        $message = '[pid:' . posix_getpid() . '] ' . $message;
-    }
-    $action = strtolower($type);
-    getDI()->get('logger', ['LESTORE', 'async_' . date('Ymd') . '.log', $type])->$action($message);
-}
-
-/**
- * 调试日志
+ * @notes: 调试日志
+ * @author: NedRen<ned@pproject.co>
+ * @date: 2018/8/30
  * @param mixed $message 信息
  * @param string $type 类型（debug、error、info、notice、warning、alert、log）
  * @param boolean $simple 简单模式，如果为true则不显示文件和行号及类名和方法名
  * @param boolean $option 是否显示文件和行号及类名和方法名
  * @param string|array $filename 文件名或数组，数组格式：['payments', 'log']，第一个为文件路径，第二个为文件名，如果文件名为空字符串，则使用日期标识
- * @author wangyu <wangyu@ledouya.com>
- * @createTime 2018/3/16 14:43
- * @version 1.2.0
  */
 function debug($message, $type = 'DEBUG', $simple = false, $option = false, $filename = null)
 {
@@ -144,18 +81,18 @@ function debug($message, $type = 'DEBUG', $simple = false, $option = false, $fil
         $message = ' ' . $message;
     }
     $action = strtolower($type);
-    getDI()->get('logger', ['LESTORE', $filename, $type])->$action($message);
+    getDI()->get('logger', ['bxPayment', $filename, $type])->$action($message);
 }
 
 /**
- * 浏览器友好的变量输出
+ * @notes: 浏览器友好的变量输出
+ * @author: NedRen<ned@pproject.co>
+ * @date: 2018/8/30
  * @param mixed $var 变量
  * @param bool $echo 是否输出 默认为true 如果为false 则返回输出字符串
  * @param string $label 标签 默认为空
  * @param bool $strict 是否严谨 默认为true
  * @return mixed|null|string|string[]
- * @author wangyu <wangyu@ledouya.com>
- * @createTime 2018/3/16 15:18
  */
 function dumps($var, $echo = true, $label = NULL, $strict = true)
 {
@@ -189,7 +126,9 @@ function dumps($var, $echo = true, $label = NULL, $strict = true)
 }
 
 /**
- * 文件上传
+ * @notes: 文件上传
+ * @author: NedRen<ned@pproject.co>
+ * @date: 2018/8/30
  * @param string $rootPath 文件上传保存的根路径
  * @param string $savePath 文件的保存路径（相对于根路径）
  * @param array $file 文件数组
@@ -200,10 +139,8 @@ function dumps($var, $echo = true, $label = NULL, $strict = true)
  * @param integer $maxSize 文件上传的最大文件大小（以字节为单位），0为不限大小
  * @param bool $replace 存在同名文件是否是覆盖，默认为true
  * @param bool $autoSub 自动使用子目录保存上传文件
- * @return mixed
+ * @return array|bool
  * @throws Exception
- * @author wangyu <wangyu@ledouya.com>
- * @createTime 2018/3/21 8:41
  */
 function upload($rootPath, $savePath, $file, $one = true, $saveName = null, $exts = [], $mimes = [], $maxSize = 0, $replace = true, $autoSub = false)
 {
@@ -246,8 +183,8 @@ function upload($rootPath, $savePath, $file, $one = true, $saveName = null, $ext
 
 /**
  * @notes: 将数组分割拼接成,形式字符串
- * @author: KevinRen<330202207@qq.com>
- * @date: 2018/4/8
+ * @author: NedRen<ned@pproject.co>
+ * @date: 2018/8/30
  * @param array $arr
  * @param $valName
  * @return string
@@ -416,7 +353,6 @@ function batchUpdate($table, $data, $field, array $params = [])
     return $sql;
 }
 
-
 /**
  * 将二维数组转换成CASE WHEN THEN的批量更新条件
  * @param $data array 二维数组
@@ -454,59 +390,3 @@ function parseParams($params)
     return $where ? ' AND ' . implode(' AND ', $where) : '';
 }
 
-/**
- * 获取内部认证令牌
- * @return bool
- * @author wangyu <wangyu@ledouya.com>
- * @createTime 2018/5/12 8:55
- */
-function getAuthorizeToken()
-{
-    $cacheKey = 'authorize_token';
-    if ($data = \Phwoolcon\Cache::get($cacheKey)) {
-        $data = unserialize($data);
-        if (time() < ($data['exp'] - 300)) {
-            return $data['token'];
-        } else {
-            \Phwoolcon\Cache::delete($cacheKey);
-        }
-    }
-    $requestData = [
-        'token' => 'LESTORE_SYSTEM', //唯一标识
-        'role' => 'system', //角色
-    ];
-    $encryptString = \core\service\security\Secret::encrypt('AES', json_encode($requestData), \core\service\security\KeyConfig::SECRET_KEY_AES_LESTORE); //数据加密
-    try {
-        $requestUri = 'https://auth.ledianyun.com/authorize/token/builder';
-        $response = json_decode(curlRequest($requestUri, true, ['exp' => 60 * 60 * 12, 'data' => $encryptString]), true);
-        if (!empty($response) && $response['error'] == 0) {
-            $decrypt = \core\service\security\Secret::decrypt('AES', $response['data']['encrypt'], \core\service\security\KeyConfig::SECRET_KEY_AES_LESTORE); //数据解密
-            $decode = json_decode($decrypt, true); //数据解码
-            if (empty($decode)) {
-                return false;
-            }
-            \Phwoolcon\Cache::set($cacheKey, serialize($decode));
-            return $decode['token'];
-        }
-    } catch (\Exception $e) {
-        debug('系统令牌生成失败，错误信息：' . $e->getMessage());
-        return false;
-    }
-}
-
-/**
- * 生成二维码
- * @param string $data 数据
- * @param string $level 容错级别
- * @param int $size 生成图片大小
- * @param int $margin 生成图片的边距大小
- * @throws Exception
- * @author wangyu <wangyu@ledouya.com>
- * @createTime 2018/5/7 18:06
- */
-function builderQRcode($data, $level = 'M', $size = 10, $margin = 1)
-{
-    load()->func('phpqrcode');
-    $data = urldecode($data);
-    QRcode::png($data, false, $level, $size, $margin);
-}

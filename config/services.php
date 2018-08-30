@@ -7,12 +7,14 @@
 
 use Phalcon\Mvc\Router;
 use Phalcon\Config\Adapter\Php;
-use Phalcon\Crypt;
-use Marser\App\Core\PhalBaseLogger;
+use core\library\RepositoryFactory;
 use Phalcon\Session\Adapter\Files as SessionAdapter;
 use Phalcon\Http\Response\Cookies;
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Mvc\Model\Manager;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+use Monolog\Formatter\LineFormatter;
 
 
 /**
@@ -32,12 +34,19 @@ $di->set('router', function () use ($di) {
 });
 
 /**
- * DI注册加密服务
+ * DI注册aip地址
  */
-$di->set("crypt", function () {
-    $crypt = new Crypt();
-    $crypt->setKey('/^pgapi$/');
-    return $crypt;
+$di->setShared('apiList', function () use ($di) {
+    $apiList = new Php(ROOT_PATH . "/config/host_api.php");
+    return $apiList;
+});
+
+/**
+ * DI注册仓库工厂
+ */
+$di->set("repository", function () {
+    $repository = new RepositoryFactory();
+    return $repository;
 });
 
 /**
@@ -52,9 +61,32 @@ $di->set('cookies', function () {
 /**
  * DI注册日志服务
  */
-$di->setShared('logger', function () use ($di) {
-    $day = date('Ymd');
-    $logger = new PhalBaseLogger(ROOT_PATH . "/cache/logs/{$day}.log");
+$di->set('logger', function ($name = 'bxPayment', $filename = null, $type = 'DEBUG') {
+    $filePath = ROOT_PATH . '/cache/logs';
+    if (is_array($filename) && count($filename) == 2) {
+        $filename = array_values($filename);
+        $filePath .= '/' . $filename[0];
+        $filename = $filename[1];
+    } else {
+        $filePath .= '/' . strtolower($type);
+    }
+    is_dir($filePath) or mkdir($filePath, 0777, true);
+    if (empty($filename)) {
+        $filename = date('Ymd') . '.log';
+    }
+    $path = $filePath . '/' . $filename;
+    if (!file_exists($path)) {
+        $fp = fopen($path, 'w');
+        chmod($path, 0777);
+        fclose($fp);
+    }
+    // 创建日志频道
+    $logger = new Logger($name);
+    $formatter = new LineFormatter(null, 'Y-m-d H:i:s');
+    $stream = new StreamHandler($path, Logger::class . '::' . strtoupper($type));
+
+    $stream->setFormatter($formatter);
+    $logger->pushHandler($stream);
     return $logger;
 });
 
@@ -78,9 +110,8 @@ $di->setShared('config', function () use ($config) {
  * DI注册DB配置
  */
 $di->setShared('db', function () use ($config, $di) {
-    $dbConfig = $config->database->dbMaster;
+    $dbConfig = $config->database->dbMaster->toArray();
 
-    $dbConfig = $dbConfig->toArray();
     if (!is_array($dbConfig) || count($dbConfig) == 0) {
         throw new \Exception("the database config is error");
     }
@@ -103,9 +134,11 @@ $di->setShared('db', function () use ($config, $di) {
                 $params = $connection->getSqlVariables();
                 (is_array($params) && count($params)) && $params = json_encode($params);
                 $executeTime = $profile->getTotalElapsedSeconds();
+
+                $message = "{$sql} {$params} {$executeTime}";
                 //日志记录
-                $logger = $di->get('logger');
-                $logger->write_log("{$sql} {$params} {$executeTime}", 'debug');
+                $di->get('logger', ['bxPayment'])->debug($message);
+
             }
         });
     }
@@ -143,4 +176,22 @@ $di->setShared('jsonApi', function () use ($di) {
     return $validator;
 });
 
+/**
+ * DI注册 redis 服务
+ */
+$di->setShared('redis', function () use ($config, $di) {
+    $dbConfig = $config->redis->servers->toArray();
+    $count = count($dbConfig);
+    //单点
+    if (1 == $count) {
+        $redis = new \Redis();
+        list($host, $port) = explode(':', $dbConfig[0]);
+        if (!$redis->connect($host, $port)) {
+            return false;
+        }
+        $redis->auth($cfg->redis->auth ?? '');
+    }
+    $redis->setOption(\Redis::OPT_SERIALIZER, \Redis::SERIALIZER_PHP);
+    return $redis;
+});
 

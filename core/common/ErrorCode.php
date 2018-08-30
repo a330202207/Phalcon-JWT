@@ -11,4 +11,11 @@ class ErrorCode
 {
     const SUCCESS = 0; //成功
     const FAILED = -1; //失败
+
+    const PAYMENT_CHANNEL_ERROR = 10001; //支付渠道
+
+
+
+
+    const INVALID_PARAMETER_ERROR = 40001;//非法参数，无效参数
 }

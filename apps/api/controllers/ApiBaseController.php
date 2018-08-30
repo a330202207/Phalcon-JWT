@@ -12,4 +12,11 @@ use core\base\ControllerBase;
 class ApiBaseController extends ControllerBase
 {
 
+    public function initialize()
+    {
+
+    }
+
+
+
 }
