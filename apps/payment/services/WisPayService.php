@@ -11,6 +11,7 @@ namespace Apps\Payment\Services;
 use core\library\Request;
 use core\library\Payment;
 use Apps\Payment\Models\Payment as PaymenModel;
+use core\library\security\RSA;
 
 class WisPayService extends PaymentBaseService implements Payment
 {
@@ -60,7 +61,8 @@ class WisPayService extends PaymentBaseService implements Payment
             "payType" => getDI()->getModuleConfig()->payment_interface->wispay->pay_type[$params['pay_type']],
             "channel" => $params['channel'],
         ];
-        $data['sign'] = rsaSign(getSignatureData($data), getDI()->getModuleConfig()->payment_interface->wispay->private_key);//签名
+        $private_key = getDI()->getModuleConfig()->payment_interface->wispay->private_key;
+        $data['sign'] = RSA::encrypt($params, $private_key);//签名
         return $data;
     }
 
@@ -74,12 +76,8 @@ class WisPayService extends PaymentBaseService implements Payment
      */
     public static function verifyData(array $params)
     {
-        $sign = $params['sign'];
-        unset($params['sign']);
-
-        $data = getSignatureData($params);
-
-        $res = rsaVerify($data, $sign, getDI()->getModuleConfig()->payment_interface->wispay->public_key);
+        $public_key = getDI()->getModuleConfig()->payment_interface->wispay->public_key;
+        $res = RSA::decrypt($params, $public_key);
 
         if ($res) {
             throw new \Exception('验签失败！');
@@ -96,11 +94,8 @@ class WisPayService extends PaymentBaseService implements Payment
      */
     public static function updatePaymentDetail(array $params)
     {
-
         $payment_Obj = PaymenModel::findFirst(['seqId' => $params['seqId']]);
-
         $status = $params['stat'] == '0000' ? 1 : 2;
-
         $res = $payment_Obj->update([
             'status' => $status,
             'updated_at' => time()

@@ -270,7 +270,7 @@
 <script src="../../js/fastclick.js"></script>
 <script type="text/javascript" src="../../js/rem.js"></script>
 <script type="text/javascript">
-  var payData = {{data}};
+  var payData = <?= $data ?>;
   console.log(payData);
 </script>
 <script src="../../js/index.js"></script>

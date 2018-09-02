@@ -24,9 +24,9 @@ class Module implements ModuleDefinitionInterface
         $loader->registerNamespaces(
             [
                 "Apps\\Api\\Controllers" => ROOT_PATH . "/apps/api/controllers/",
-                "Apps\\Api\\Models"      => ROOT_PATH . "/apps/api/models/",
-                "Apps\\Api\\Services"    => ROOT_PATH . "/apps/api/services/",
-                "Apps\\Api\\Views"    => ROOT_PATH . "/apps/api/views/",
+                "Apps\\Api\\Models" => ROOT_PATH . "/apps/api/models/",
+                "Apps\\Api\\Services" => ROOT_PATH . "/apps/api/services/",
+                "Apps\\Api\\Views" => ROOT_PATH . "/apps/api/views/",
             ]
         );
         $loader->register();
@@ -44,7 +44,7 @@ class Module implements ModuleDefinitionInterface
          * 注意：该方式与系统本身配置获取方式不同，如需使用系统核心配置请使用Config::get()方式
          */
         if (file_exists(__DIR__ . '/config/config.php')) {
-            $di->set('ModuleConfig', function () use ($di) {
+            $di->set('moduleConfig', function () use ($di) {
                 return new Config(include __DIR__ . '/config/config.php');
             });
         }
@@ -112,7 +112,7 @@ class Module implements ModuleDefinitionInterface
      */
     protected function registerUrlService(DiInterface $di)
     {
-        $config = $di->get('ModuleConfig');
+        $config = $di->get('moduleConfig');
 
         $di->set('url', function () use ($config) {
             $url = new \Phalcon\Mvc\Url();
@@ -128,16 +128,19 @@ class Module implements ModuleDefinitionInterface
      */
     protected function registerViewService(DiInterface $di)
     {
-        $config = $di->get('ModuleConfig');
+        $config = $di->get('moduleConfig');
 
         $di->setShared('view', function () use ($config) {
             $view = new View();
             $view->setViewsDir($config->views);
             $view->setDI($this);
-            //$view->setPartialsDir($config->views);
+
+            //自动创建模版目录
+            is_dir($config->compiled_path) or mkdir($config->compiled_path, 0777, true);
+
             $view->registerEngines([
                 '.volt' => function ($view) {
-                    $config = $this->get('ModuleConfig');
+                    $config = $this->get('moduleConfig');
                     $volt = new VoltEngine($view, $this);
                     $volt->setOptions([
                         'compiledPath' => $config->compiled_path,
@@ -145,15 +148,9 @@ class Module implements ModuleDefinitionInterface
                         'compiledSeparator' => '_',
                         'compileAlways' => TRUE
                     ]);
-                    
-                    //$compiler = $volt->getCompiler();
-
                     return $volt;
                 },
-                //'.phtml' => PhpEngine::class
-
             ]);
-
             return $view;
         });
     }

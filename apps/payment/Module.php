@@ -9,8 +9,10 @@ use Phalcon\Mvc\Dispatcher as MvcDispatcher;
 use Phalcon\Events\Manager as EventsManager;
 use Phalcon\Mvc\View;
 use Phalcon\Loader;
+use Phalcon\Mvc\Url;
 use Phalcon\Mvc\Router;
 use Phalcon\Config\Adapter\Php;
+use Phalcon\Mvc\View\Engine\Volt as VoltEngine;
 
 
 class Module implements ModuleDefinitionInterface
@@ -60,27 +62,6 @@ class Module implements ModuleDefinitionInterface
     }
 
     /**
-     * DI注册模块路由服务
-     * @param DiInterface $di
-     */
-    protected function registerRoutersService(DiInterface $di)
-    {
-        $di->set('router', function () use ($di) {
-            $router = new Router();
-            $router->setDefaultModule('api');
-
-            $routerRules = new Php(__DIR__ . "/config/routers.php");
-
-            foreach ($routerRules->toArray() as $key => $value) {
-
-                $router->add($key, $value);
-            }
-
-            return $router;
-        });
-    }
-
-    /**
      * DI注册dispatcher服务
      * @param DiInterface $di
      */
@@ -111,7 +92,7 @@ class Module implements ModuleDefinitionInterface
         $config = $di->get('moduleConfig');
 
         $di->set('url', function () use ($config) {
-            $url = new \Phalcon\Mvc\Url();
+            $url = new Url();
             $url->setBaseUri($config->module_pathInfo);
             $url->setStaticBaseUri($config->assets_url);
             return $url;
@@ -129,7 +110,44 @@ class Module implements ModuleDefinitionInterface
         $di->setShared('view', function () use ($config) {
             $view = new View();
             $view->setViewsDir($config->views);
+            $view->setDI($this);
+
+            //自动创建模版目录
+            is_dir($config->compiled_path) or mkdir($config->compiled_path, 0777, true);
+
+            $view->registerEngines([
+                '.volt' => function ($view) {
+                    $config = $this->get('moduleConfig');
+                    $volt = new VoltEngine($view, $this);
+                    $volt->setOptions([
+                        'compiledPath' => $config->compiled_path,
+                        'compiledExtension' => '.compiled',
+                        'compiledSeparator' => '_',
+                        'compileAlways' => false
+                    ]);
+                    return $volt;
+                },
+            ]);
             return $view;
+        });
+    }
+
+    /**
+     * DI注册模块路由服务
+     * @param DiInterface $di
+     */
+    protected function registerRoutersService(DiInterface $di)
+    {
+        $di->set('router', function () use ($di) {
+            $router = new Router();
+            $router->setDefaultModule('payment');
+            $routerRules = new Php(__DIR__ . "/config/routers.php");
+
+            foreach ($routerRules->toArray() as $key => $value) {
+                $router->add($key, $value);
+            }
+
+            return $router;
         });
     }
 }

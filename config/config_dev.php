@@ -6,12 +6,12 @@
  */
 return [
     'app' => [
-        //类库路径
-        'libs' => ROOT_PATH . '/core/library/',
         //日志根目录
-        'log_path' => ROOT_PATH . '/cache/logs/',
-        //缓存路径
-        'cache_path' => ROOT_PATH . '/cache/data/',
+        'log_path' => ROOT_PATH . '/cache/logs',
+
+        //模型缓存目录
+        'models_cache_path' => ROOT_PATH . '/cache/db/',
+
 
         //根命名空间
         'root_namespace' => 'Payment',

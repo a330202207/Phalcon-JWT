@@ -34,8 +34,8 @@ class ApiException extends \Exception
     public function getBody()
     {
         return json_encode([
-            'error' => $this->getCode(),
-            'error_reason' => $this->getMessage()
+            'status' => $this->getCode(),
+            'msg' => $this->getMessage()
         ]);
     }
 }

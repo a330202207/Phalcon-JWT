@@ -18,9 +18,13 @@ class PaychanController extends ApiBaseController
      */
     public function indexAction()
     {
-        //$token = $this->request->get('token');
-        $token = '96ebdcb18c73933d2f1fab99bd9f6680';
+        $token = $this->request->get('token');
+        $os_type = $this->request->get('os_type');//客户端
+        $is_mobile = $this->request->get('is_mobile');
+        //$token = '7c316760842413654188ffaf47e95b65';
         $data  = Paychan::getPayList($token);
+        $data['os_type']   = $os_type??'';//客户端
+        $data['is_mobile'] = $is_mobile??'';
         //var_dump($data);die;
         $this->view->data = json_encode($data);
         $this->view->partial('payment/recharge');
@@ -28,11 +32,12 @@ class PaychanController extends ApiBaseController
 
 
     /**
-     * get all pay type channel list
-     * 获取所有支付方式对应的渠道列表
+     *
+     * 发起充值
      * */
-    public function getPayListAction(){
-
+    public function createAction(){
+        $data = $this->request->getPost();
+        $data  = Paychan::create();
     }
 
 

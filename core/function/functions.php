@@ -32,7 +32,6 @@ function endWith($haystack, $needle)
 }
 
 /**
- *
  * php时间戳转成mysql timestamp 类型
  *
  * @param bool $format_u
@@ -51,7 +50,6 @@ function timestamp($format_u = false, $time = null)
     }
     return $str;
 }
-
 
 /**
  * 使用CURL进行请求
@@ -1086,21 +1084,29 @@ function base64EncodeImage($image_file)
 }
 
 /**
- * 将参数数组格式化成url参数
- * @param array $values 参数数组
+ * @notes: 将参数数组格式化成url参数
+ * @author: NedRen<ned@pproject.co>
+ * @date: 2018/8/31
+ * @param array $params
+ * @param bool $flag
  * @return string
- * @author KingRainy <kingrainy@163.com>
  */
-function arrayToUrlParams($values)
+function arrayToUrlParams(array $params, $flag = false)
 {
-    $buff = '';
-    foreach ($values as $k => $v) {
-        if ($v != '' && !is_array($v)) {
-            $buff .= $k . '=' . $v . '&';
-        }
+    //ASCII码从小到大排序
+    if ($flag == true) {
+        ksort($params);
+        reset($params);
     }
-    $buff = trim($buff, '&');
-    return $buff;
+    $data = [];
+    foreach ($params as $k => $v) {
+        $data[] = $k . '=' . $v;
+    }
+
+    $string = implode('&', $data);
+
+    return $string;
+
 }
 
 /**
@@ -1387,76 +1393,6 @@ function commandLineOutput($message, $status = 'NOTE')
     echo commandLineColorize($message, $status) . PHP_EOL;
 }
 
-/**
- * @notes: 获取签名数据
- * @author: NedRen<ned@pproject.co>
- * @date: 2018/8/22
- * @param array $params
- * @return string
- */
-function getSignatureData(array $params)
-{
-    if(is_array($params)){
-        ksort($params);
-        reset($params);
-    }
-    $data = [];
-    foreach ($params as $k => $v) {
-        $data[] = $k . '=' . $v;
-    }
-
-    $string = implode('&', $data);
-    if (get_magic_quotes_gpc()) {
-        $string = stripslashes($string);
-    }
-
-    return $string;
-}
-
-/**
- * @notes: rsa 签名
- * @author: NedRen<ned@pproject.co>
- * @date: 2018/8/22
- * @param string $string 签名数据
- * @param string $private_key  私钥
- * @return bool|string
- */
-function rsaSign(string $string, $private_key)
-{
-    $privateKey = openssl_pkey_get_private($private_key);
-    if ($privateKey) {
-        $opt = openssl_sign($string, $sign, $privateKey , OPENSSL_ALGO_SHA1);
-        if ($opt) {
-            openssl_free_key($privateKey);
-            /*base64编码*/
-            //$sign = base64_encode($sign);
-            /*16进制*/
-            $sign = strtoupper(bin2hex($sign));
-            return $sign;
-        }
-    }
-    return false;
-}
-
-/**
- * @notes: RSA验签
- * @author: NedRen<ned@pproject.co>
- * @date: 2018/8/23
- * @param array $data 待签名数据
- * @param string $sign 需要验签的签名
- * @param string $public_key 公钥
- * @return bool|string
- */
-function rsaVerify($data, $sign, $public_key)
-{
-    $res = openssl_get_publickey($public_key);
-    if ($res) {
-        $result = (bool)openssl_verify($data, pack("H*",$sign), $res, OPENSSL_ALGO_SHA1);
-        openssl_free_key($res);
-        return $result;
-    }
-    return false;
-}
 
 /**
  * @notes: 参数过滤
@@ -1479,8 +1415,6 @@ if (!function_exists('secure_filter')) {
     /**
      * 安全过滤
      * @param string $value 值
-     * @author wangyu <wangyu@ledouya.com>
-     * @createTime 2018/4/3 11:13
      */
     function secure_filter(&$value)
     {
@@ -1491,10 +1425,3 @@ if (!function_exists('secure_filter')) {
     }
 }
 
-
-function idebug($message, $type = 'DEBUG')
-{
-    if (IS_DEBUG) {
-        debug($message, $type);
-    }
-}

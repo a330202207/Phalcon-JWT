@@ -15,16 +15,6 @@ $designWidth: 720;
   }
 }
 
-.ui_bank {
-  background-image: url("../img/ui_bank.png");
-  background-size: p(981) auto;
-  transform-origin: left top;
-}
-
-@include sprites(ui_bank_down_line, 1, 9, 213, 5, 0, 0, 213, 5);
-@include sprites(ui_bank_img, 933, 1, 47, 47, 0, 0, 47, 47);
-@include sprites(ui_bank_line, 1, 1, 930, 6, 0, 0, 930, 6);
-
 .ui_lobby_bank_source {
   background-image: url("../img/ui_lobby_bank_source.png");
   background-size: p(992) auto;
@@ -189,6 +179,18 @@ $designWidth: 720;
 @include sprites(report_shading_bg, 2, 2, 1031, 181, 0, 0, 1031, 181);
 @include sprites(report_shading_title, 1037, 2, 542, 250, 0, 0, 542, 250);
 
+.ui_lobby_common {
+  background-image: url("../img/ui_lobby_common.png");
+  background-size: p(1024) auto;
+  transform-origin: left top;
+}
+
+@include sprites(grid_inner_window, 937, 1, 86, 62, 0, 0, 86, 62);
+@include sprites(grid_window_4, 1, 193, 446, 181, 0, 0, 446, 181);
+@include sprites(title_alert, 537, 539, 128, 93, 0, 0, 128, 93);
+@include sprites(button_round4_up_x, 677, 262, 233, 89, 0, 0, 233, 89);
+
+
 //九宫格
 .grid_input_bg{
   border-image-source: url("../img/grid_input_bg.png");
@@ -290,9 +292,21 @@ input:-ms-input-placeholder{
 
 .menban {
   position: fixed;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, .3);
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  // background: rgba(0, 0, 0, .3);
+}
+
+.whole-screen-layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: transparent;
+  z-index: 10;
 }
 
 #popup {

@@ -10,12 +10,16 @@ use Phalcon\Config\Adapter\Php;
 use core\library\RepositoryFactory;
 use Phalcon\Session\Adapter\Files as SessionAdapter;
 use Phalcon\Http\Response\Cookies;
+use Phalcon\Events\Manager as EventsManager;
+use Phalcon\Db\Profiler;
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Mvc\Model\Manager;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Formatter\LineFormatter;
-
+use Phalcon\Cache\Frontend\Data as FrontendData;
+use Phalcon\Cache\Backend\File as BackendFile;
+use core\library\Msg;
 
 /**
  * DI注册路由服务
@@ -61,8 +65,8 @@ $di->set('cookies', function () {
 /**
  * DI注册日志服务
  */
-$di->set('logger', function ($name = 'bxPayment', $filename = null, $type = 'DEBUG') {
-    $filePath = ROOT_PATH . '/cache/logs';
+$di->set('logger', function ($name = 'bxPayment', $filename = null, $type = 'DEBUG') use ($config) {
+    $filePath = $config->app->log_path;
     if (is_array($filename) && count($filename) == 2) {
         $filename = array_values($filename);
         $filePath .= '/' . $filename[0];
@@ -88,6 +92,26 @@ $di->set('logger', function ($name = 'bxPayment', $filename = null, $type = 'DEB
     $stream->setFormatter($formatter);
     $logger->pushHandler($stream);
     return $logger;
+});
+
+/**
+ * DI注册模型缓存服务
+ */
+$di->set('modelsCache', function () use ($config) {
+
+    $filePath = $config->app->models_cache_path;
+
+    $frontCache = new FrontendData([
+            'lifetime' => 86400,
+        ]
+    );
+
+    is_dir($filePath) or mkdir($filePath, 0700, true);
+    $cache = new BackendFile($frontCache, [
+            'cacheDir' => $filePath,
+        ]
+    );
+    return $cache;
 });
 
 /**
@@ -117,9 +141,10 @@ $di->setShared('db', function () use ($config, $di) {
     }
 
     if (RUNTIME != 'prd') {
-        $eventsManager = new \Phalcon\Events\Manager();
+        $eventsManager = new EventsManager();
+
         // 分析底层sql性能，并记录日志
-        $profiler = new Phalcon\Db\Profiler();
+        $profiler = new Profiler();
         $eventsManager->attach('db', function ($event, $connection) use ($profiler, $di) {
             if ($event->getType() == 'beforeQuery') {
                 //在sql发送到数据库前启动分析
@@ -172,7 +197,7 @@ $di->setShared('modelsManager', function () use ($di) {
  * DI注册 jsonApi 服务
  */
 $di->setShared('jsonApi', function () use ($di) {
-    $validator = new \core\library\Msg($di);
+    $validator = new Msg($di);
     return $validator;
 });
 

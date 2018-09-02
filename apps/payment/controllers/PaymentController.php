@@ -40,8 +40,8 @@ class PaymentController extends PaymentBaseController
     public function callBackPaymentAction()
     {
         try {
-            $arr = ['id' => 3];
-            dump($arr);die;
+            $arr = ['id' => 3,'arr' => '2'];
+
             $data = $this->params();
             $res = PaymentService::updatePayment($data);die;
             if ($res) {

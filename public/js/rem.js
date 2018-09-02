@@ -11,6 +11,6 @@
       docEl.style.fontSize = 20 * (clientWidth / 320) + 'px';
     };
   if (doc.addEventListener === undefined) return;
-  win.addEventListener(resizeEvt, recalc, false);
+  // win.addEventListener(resizeEvt, recalc, false);
   doc.addEventListener('DOMContentLoaded', recalc, false)
 })(document, window);

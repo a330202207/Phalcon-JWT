@@ -52,9 +52,9 @@ try {
 
 } catch (\Exception $e) {
     if (APP_DEBUG == true) {
-        echo $e->getMessage() . '<br>';
-        echo '<pre>' . $e -> getFile() . '</pre>';
-        echo '<pre>' . $e -> getMessage() . '</pre>';
+        echo '<pre>' . $e->getMessage() . '</pre>';
+        echo '<pre>' . $e->getFile() . '</pre>';
+        echo '<pre>' . $e->getMessage() . '</pre>';
         echo '<pre>' . $e->getTraceAsString() . '</pre>';
     } else {
         $log = [
