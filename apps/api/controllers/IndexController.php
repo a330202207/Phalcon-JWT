@@ -12,7 +12,8 @@ class IndexController extends ApiBaseController
 
     public function indexAction()
     {
-        echo "<h1>Hello1</h1>";
+        $this->view->data = 'Hello World!';
+        $this->view->partial('index/index');
     }
 
 

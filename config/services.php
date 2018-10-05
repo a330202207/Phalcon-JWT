@@ -140,7 +140,7 @@ $di->setShared('db', function () use ($config, $di) {
         throw new \Exception("the database config is error");
     }
 
-    if (RUNTIME != 'prd') {
+    if (RUNTIME != 'prod') {
         $eventsManager = new EventsManager();
 
         // 分析底层sql性能，并记录日志
@@ -162,7 +162,7 @@ $di->setShared('db', function () use ($config, $di) {
 
                 $message = "{$sql} {$params} {$executeTime}";
                 //日志记录
-                $di->get('logger', ['bxPayment'])->debug($message);
+                $di->get('logger', ['Api'])->debug($message);
 
             }
         });
@@ -219,4 +219,8 @@ $di->setShared('redis', function () use ($config, $di) {
     $redis->setOption(\Redis::OPT_SERIALIZER, \Redis::SERIALIZER_PHP);
     return $redis;
 });
+
+
+
+
 

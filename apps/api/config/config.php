@@ -24,10 +24,4 @@ return [
     //模板路径
     'compiled_path' => ROOT_PATH . '/cache/compiled/api/',
 
-    'platform'=>[
-        //平台接口地址
-        'dev' => 'login.dev.com',
-        'test'=> 'login.jndsfs.com',
-        'prd' => 'login.029hch.com',
-    ]
 ];

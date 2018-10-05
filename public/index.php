@@ -5,23 +5,22 @@ header('Access-Control-Allow-Headers: accept, content-type, token, key');
 header('Access-Control-Expose-Headers: *');
 header('content-type:text/html;charset=utf-8');
 
-ini_set('date.timezone','Asia/Shanghai');
+ini_set('date.timezone', 'Asia/Shanghai');
 
 defined('ROOT_PATH') || define('ROOT_PATH', dirname(__DIR__));
-
-$runtime = 'dev';
 
 try {
 
     $di = new Phalcon\DI\FactoryDefault();
+
+    require ROOT_PATH . '/core/library/InvironMent.php';
 
     /**
      * 引入const.php
      */
     include ROOT_PATH . '/config/const.php';
 
-    $config = new \Phalcon\Config\Adapter\Php(ROOT_PATH . "/config/config_". RUNTIME .".php");
-
+    $config = new \Phalcon\Config\Adapter\Php(ROOT_PATH . "/config/config_" . RUNTIME . ".php");
 
     /**
      * 引入loader.php
@@ -50,19 +49,37 @@ try {
 
     $response->send();
 
-} catch (\Exception $e) {
-    if (APP_DEBUG == true) {
+} catch (\Throwable $e) {
+
+    if (RUNTIME != 'prd' && RUNTIME != 'test') {
+        echo '<pre>' . $e->getCode() . '</pre>';
         echo '<pre>' . $e->getMessage() . '</pre>';
         echo '<pre>' . $e->getFile() . '</pre>';
         echo '<pre>' . $e->getMessage() . '</pre>';
-        echo '<pre>' . $e->getTraceAsString() . '</pre>';
+        echo '<pre>' . nl2br( $e->getTraceAsString()) . '</pre>';
     } else {
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $client_ip = $_SERVER['HTTP_CLIENT_IP'];
+        } else {
+            $client_ip = "0";
+        }
+
+        if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $x_client_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else {
+            $x_client_ip = "0";
+        }
+
         $log = [
-            'file'  => $e -> getFile(),
-            'line'  => $e -> getLine(),
-            'code'  => $e -> getCode(),
-            'msg'   => $e -> getMessage(),
-            'trace' => $e -> getTraceAsString(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'code' => $e->getCode(),
+            'msg' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+            'userAgent' => $_SERVER['HTTP_USER_AGENT'],
+            'userIp' => $_SERVER['REMOTE_ADDR'],
+            'clientIp' => $client_ip,
+            'xClintIp' => $x_client_ip,
         ];
         debug($log, 'debug');
     }
