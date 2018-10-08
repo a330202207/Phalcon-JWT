@@ -4,6 +4,7 @@
     "phalcon/ide-stubs": "*",
     "phalcon/incubator": "^3.0",
     "phalcon/devtools": "^3.1",
-    "monolog/monolog": "^1.23"
+    "monolog/monolog": "^1.23",
+    "lcobucci/jwt": "^3.2"
   }
 }
