@@ -9,8 +9,12 @@ namespace core\base;
 
 use Phalcon\Mvc\Controller;
 use Phalcon\Debug;
-use core\library\ApiException;
+//use core\library\ApiException;
 use core\common\ErrorCode;
+use core\library\Jwt\Token;
+use core\library\security\KeyConfig;
+use core\library\security\Secret;
+
 
 if (APP_DEBUG) {
     $debug = new Debug();
@@ -19,6 +23,58 @@ if (APP_DEBUG) {
 
 class ControllerBase extends Controller
 {
+    private $token;
+    private $key;   //密钥
+    private $iss;   //发行者(iss)
+    private $aud;   //接收方(aud)
+    private $jti;   //自定义标识(jti)
+
+
+    protected $is_validation = true; //是否进行认证校验
+
+    protected $payload = []; //令牌有效载荷
+    protected $claims = []; //令牌数据
+
+
+    public function onConstruct()
+    {
+        try {
+
+            if (true === $this->is_validation) {
+                $this->token = $this->params('token', null) ?: $this->request->getHeader('token');
+                $this->key = $this->params('key', Token::DEFAULT_KEY);
+                $this->iss = $this->params('iss', '');
+                $this->aud = $this->params('aud', '');
+                $this->jti = $this->params('jti', null);
+
+
+
+                //令牌不存在
+                if (empty($this->token)) {
+                    echo 1;
+//                    throw new ApiException(null, ErrorCode::AUTHORIZE_TOKEN_NOT_EXISTS);
+                }
+                $bool = Token::validationToken($this->token, $this->key, $this->iss, $this->aud, $this->jti); //验证令牌
+
+                if (true === $bool) {
+                    $parserToken = Token::parserToken($this->token, $this->key);
+
+                    if (false === $parserToken) {
+                        echo 2;
+//                        throw new ApiException(null, ErrorCode::AUTHORIZE_TOKEN_PARSER_FAILED);
+                    }
+                    $this->payload = explode('.', $this->token);
+                    $this->claims = json_decode(json_encode(array_merge($parserToken->getHeaders(), $parserToken->getClaims())), true); //解析令牌
+                } else {
+                    echo 3;
+//                    throw new ApiException(null, ErrorCode::AUTHORIZE_TOKEN_VALIDATION_FAILED);
+                }
+            }
+        } catch (\Exception $exception) {
+            echo 4;
+//            throw new ApiException($exception->getMessage(), $exception->getCode() != 0 ? $exception->getCode() : ErrorCode::FAILED);
+        }
+    }
 
     /**
      * @notes: 获取请求参数
@@ -72,7 +128,7 @@ class ControllerBase extends Controller
                     if (0 === strpos($filters, '/')) {
                         if (1 !== preg_match($filters, (string)$data)) { //支持正则验证
                             if (false !== $is_validate) {
-                                idebug('[ApiException] 参数获取异常，参数名称：' . $name);
+                                debug('[ApiException] 参数获取异常，参数名称：' . $name);
                                 throw new ApiException((true !== $is_validate && null !== $is_validate) ? $is_validate : '参数值校验失败', ErrorCode::INVALID_PARAMETER_ERROR);
                             }
                             return isset($default) ? $default : null;
@@ -91,7 +147,7 @@ class ControllerBase extends Controller
                             $data = filter_var($data, is_int($filter) ? $filter : filter_id($filter));
                             if (false === $data) {
                                 if (false !== $is_validate) {
-                                    idebug('[ApiException] 参数获取异常，参数名称：' . $name);
+                                    debug('[ApiException] 参数获取异常，参数名称：' . $name);
                                     throw new ApiException((true !== $is_validate && null !== $is_validate) ? $is_validate : '参数值校验失败', ErrorCode::INVALID_PARAMETER_ERROR);
                                 }
                                 return isset($default) ? $default : null;
@@ -102,7 +158,7 @@ class ControllerBase extends Controller
             }
         } else {
             if (false !== $is_validate) {
-                idebug('[ApiException] 参数获取异常，参数名称：' . $name);
+                debug('[ApiException] 参数获取异常，参数名称：' . $name);
                 throw new ApiException((true !== $is_validate && null !== $is_validate) ? $is_validate : '参数值校验失败', ErrorCode::INVALID_PARAMETER_ERROR);
             }
             $data = isset($default) ? $default : null; //变量默认值
