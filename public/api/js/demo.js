@@ -1,7 +1,7 @@
-let jwt = localStorage.getItem('jwt');
-
+let jwt = localStorage.getItem('token');
+console.log(jwt);
 if (jwt) {
-    axios.defaults.headers.common['X-token'] = jwt;
+    axios.defaults.headers.common['token'] = jwt;
     axios.get('/api/index/login')
         .then(function (response) {
             if (response.data.status === 0) {
