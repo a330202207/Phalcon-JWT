@@ -1,5 +1,4 @@
 let jwt = localStorage.getItem('token');
-console.log(jwt);
 if (jwt) {
     axios.defaults.headers.common['token'] = jwt;
     axios.get('/api/index/login')
@@ -19,6 +18,8 @@ if (jwt) {
 } else {
     document.querySelector('#showpage').style.display = 'block';
 }
+
+
 
 document.querySelector('#sub-btn').onclick = function () {
     let username = document.querySelector('#username').value;
@@ -60,4 +61,10 @@ document.querySelector('#sub-btn').onclick = function () {
     }).catch(function (error) {
         console.log(error);
     });
+}
+
+
+document.querySelector('#logout').onclick = function() {
+    localStorage.removeItem('token');
+    window.location.href = '/api/index/index'
 }

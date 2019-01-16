@@ -15,13 +15,12 @@ class IndexController extends ApiBaseController
 
     public function indexAction()
     {
-//        var_dump($this->params());die;
         $this->view->pick('index/index');
     }
 
     public function loginAction()
     {
-//        var_dump($this->claims);
+//        var_dump($this->claims);die;
 //        $data = $this->request->getPost();
         $data = [
             'user_name' => $this->claims['user_name'],
